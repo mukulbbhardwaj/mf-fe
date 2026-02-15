@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../Layout";
 import useStore from "@/store/userStore";
 import PortfolioQuickView from "@/components/dashboardComponents/PortfolioQuickView";
@@ -47,6 +48,7 @@ type PortfolioData = {
 
 const DashboardPage: FC<DashboardPageProps> = () => {
   const userStore = useStore();
+  const navigate = useNavigate();
   const [portfolioInfo, setPortfolioInfo] = useState<PortfolioData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,24 +59,48 @@ const DashboardPage: FC<DashboardPageProps> = () => {
         setIsLoading(true);
         setError(null);
 
-        if (userStore.user) {
-          const data = await getPortfolioInfo();
-          setPortfolioInfo(data);
-        } else {
-          setError("User not found. Please log in.");
+        // Check if user exists
+        if (!userStore.user) {
+          // Redirect to login if no user after persist loads
+          setIsLoading(false);
+          setTimeout(() => {
+            navigate("/login");
+          }, 100);
+          return;
         }
-      } catch (err) {
+
+        // Check if API URL is configured
+        const apiUrl = import.meta.env.VITE_SERVER_URL;
+        if (!apiUrl) {
+          console.error("VITE_SERVER_URL is not configured");
+          setError("Server configuration error. Please check environment variables.");
+          setIsLoading(false);
+          return;
+        }
+
+        const data = await getPortfolioInfo();
+        setPortfolioInfo(data);
+      } catch (err: any) {
         console.error("Error fetching portfolio data:", err);
-        setError("Failed to load portfolio data. Please try again.");
+        const errorMessage = err.response?.data?.message || err.message || "Failed to load portfolio data. Please try again.";
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (userStore.user) {
+    // Small delay to allow Zustand persist to load from localStorage
+    const timer = setTimeout(() => {
+      console.log("Dashboard: Fetching portfolio data", {
+        hasUser: !!userStore.user,
+        userId: userStore.user?.id,
+        apiUrl: import.meta.env.VITE_SERVER_URL ? "configured" : "missing"
+      });
       fetchPortfolioData();
-    }
-  }, [userStore.user?.id]);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [userStore.user?.id, navigate]);
 
   if (isLoading) {
     return (
