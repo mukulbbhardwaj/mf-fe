@@ -150,15 +150,15 @@ const ChallengePage: FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Trading Challenge</h1>
-          <p className="text-muted-foreground mt-1">
-            Practice with historical Indian stock data. Choose BUY, SELL, or HOLD based on the chart.
+      <div className="max-w-4xl mx-auto space-y-8">
+        <section>
+          <h1 className="text-3xl font-bold tracking-tight">Market Replay</h1>
+          <p className="text-muted-foreground mt-2 max-w-xl">
+            Practice with historical Indian stock data. View the chart, choose BUY, SELL, or HOLD, then see how you scored.
           </p>
-        </div>
+        </section>
 
-        <div className="rounded-lg border border-border bg-card p-4">
+        <section className="rounded-2xl border border-border bg-card p-4 sm:p-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
             <span className="font-medium text-foreground">{challenge.symbol}</span>
             <span>·</span>
@@ -181,7 +181,7 @@ const ChallengePage: FC = () => {
               Faded area = outcome after your decision
             </p>
           )}
-        </div>
+        </section>
 
         {!result ? (
           <>
@@ -220,7 +220,7 @@ const ChallengePage: FC = () => {
             </Button>
           </>
         ) : (
-          <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+          <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4">
             <div className="flex items-center gap-3 flex-wrap">
               <span
                 className={cn(
@@ -244,15 +244,17 @@ const ChallengePage: FC = () => {
                 {result.profitPercent.toFixed(2)}%
               </span>
             </div>
-            <Button onClick={handleNext}>Next challenge</Button>
-          </div>
+            <Button onClick={handleNext} className="rounded-full px-6">
+              Next challenge
+            </Button>
+          </section>
         )}
 
-        {/* Your challenge stats */}
+        {/* Your challenge stats & leaderboard */}
         {!statsLeaderboardLoading && (stats || leaderboard.length > 0) && (
-          <div className="space-y-4 pt-4 border-t border-border">
+          <section className="space-y-6 pt-6 border-t border-border">
             {stats && (
-              <div className="rounded-lg border border-border bg-card p-4">
+              <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
                 <h2 className="text-sm font-medium text-muted-foreground mb-2">
                   Your challenge stats
                 </h2>
@@ -274,7 +276,7 @@ const ChallengePage: FC = () => {
 
             {/* Challenge leaderboard */}
             {leaderboard.length > 0 && (
-              <div className="rounded-lg border border-border overflow-hidden">
+              <div className="rounded-2xl border border-border overflow-hidden">
                 <h2 className="text-sm font-medium text-muted-foreground px-4 pt-4 flex items-center gap-2">
                   <Trophy className="h-4 w-4 text-amber-500" />
                   Challenge leaderboard
@@ -330,7 +332,7 @@ const ChallengePage: FC = () => {
                 </Table>
               </div>
             )}
-          </div>
+          </section>
         )}
       </div>
     </Layout>

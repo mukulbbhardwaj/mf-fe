@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 
 const menus: { title: string; href: string }[] = [
   { title: "Learn", href: "/learn" },
-  { title: "Blogs", href: "/blogs" },
+  // { title: "Blogs", href: "/blogs" },
   { title: "Challenge", href: "/challenge" },
   { title: "Leaderboard", href: "/leaderboard" },
 ];
@@ -38,12 +38,16 @@ const Header: FC<HeaderProps> = () => {
       <div>
         <MainLogo />
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="hover:bg-accent">
-            <Menu className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
+      <div className="flex items-center gap-2">
+        <Button variant="default" size="sm" className="rounded-full hidden sm:inline-flex" asChild>
+          <Link to="/challenge">Play</Link>
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="hover:bg-accent">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end">
           <DropdownMenuGroup>
             {menus.map((menu) => (
@@ -84,7 +88,8 @@ const Header: FC<HeaderProps> = () => {
             )}
           </DropdownMenuGroup>
         </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownMenu>
+      </div>
     </header>
   );
 };

@@ -3,8 +3,9 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import BlogSectionPage from "./pages/BlogSectionPage.tsx";
+// import BlogSectionPage from "./pages/BlogSectionPage.tsx";
 import LearnSectionPage from "./pages/LearnSectionPage.tsx";
+import LessonPage from "./pages/LessonPage.tsx";
 import LoginPage from "./pages/auth/LoginPage.tsx";
 import SignupPage from "./pages/auth/SignupPage.tsx";
 import DashboardPage from "./pages/DashboardPage.tsx";
@@ -15,7 +16,6 @@ import LeaderboardPage from "./pages/LeaderboardPage.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ModulePage from "./components/learnSectionComponents/ModulePage.tsx";
-import ChapterPage from "./components/learnSectionComponents/ChapterPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -38,17 +38,14 @@ const router = createBrowserRouter([
     path: "/learn",
     element: <LearnSectionPage />,
   },
-  {
-    path: "/blogs",
-    element: <BlogSectionPage />,
-  },
+  // { path: "/blogs", element: <BlogSectionPage /> },
   {
     path: "/modules/:id",
     element: <ModulePage />,
   },
   {
-    path: "/modules/:id/chapter/:chapterID",
-    element: <ChapterPage />,
+    path: "/lessons/:id",
+    element: <LessonPage />,
   },
   {
     path: "/challenge",

@@ -1,18 +1,22 @@
 import { FC } from "react";
-import modules from "./data/modules";
 import Module from "./Module";
+import type { CategoryInfo } from "@/pages/LearnSectionPage";
 
-interface ListProps {}
+interface ModulesListProps {
+  categories: CategoryInfo[];
+}
 
-const ModulesList: FC<ListProps> = () => {
+const ModulesList: FC<ModulesListProps> = ({ categories }) => {
   return (
     <div className="flex gap-4 flex-col lg:flex-row lg:gap-32">
-      {modules.map((module) => (
+      {categories.map((cat, index) => (
         <Module
-          id={module.id}
-          name={module.name}
-          desc={module.desc}
-          color={module.color}
+          key={cat.id}
+          id={cat.id}
+          name={cat.name}
+          desc={cat.desc}
+          color={cat.color}
+          order={index}
         />
       ))}
     </div>

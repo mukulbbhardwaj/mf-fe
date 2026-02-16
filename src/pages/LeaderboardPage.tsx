@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Layout from "../Layout";
 import useStore from "@/store/userStore";
 import {
@@ -108,16 +108,19 @@ const LeaderboardPage: FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold flex items-center gap-2">
-            <Trophy className="h-7 w-7 text-amber-500" />
+      <div className="max-w-4xl mx-auto space-y-8">
+        <section>
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Trophy className="h-8 w-8 text-amber-500" />
             Leaderboard
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Weekly crypto paper trading rankings. Score = Total Return % − Max Drawdown %.
+          <p className="text-muted-foreground mt-2 max-w-xl">
+            Weekly crypto paper trading rankings. Score = Total Return % − Max Drawdown %. Higher is better.
           </p>
-        </div>
+          <Link to="/challenge" className="text-sm text-primary hover:underline mt-2 inline-block">
+            Play Market Replay →
+          </Link>
+        </section>
 
         {weekStartDate && (
           <div className="flex items-center gap-2 flex-wrap">
@@ -155,7 +158,7 @@ const LeaderboardPage: FC = () => {
         )}
 
         {myRank !== null && myRank !== "none" && (
-          <div className="rounded-lg border border-border bg-card p-4">
+          <section className="rounded-2xl border border-border bg-card p-4 sm:p-6">
             <h2 className="text-sm font-medium text-muted-foreground mb-2">
               Your rank
             </h2>
@@ -181,7 +184,7 @@ const LeaderboardPage: FC = () => {
                 {myRank.score.toFixed(2)}
               </span>
             </div>
-          </div>
+          </section>
         )}
 
         {myRank === "none" && weekStartDate && (
@@ -200,7 +203,7 @@ const LeaderboardPage: FC = () => {
             <span className="text-muted-foreground">Loading…</span>
           </div>
         ) : (
-          <div className="rounded-lg border border-border overflow-hidden">
+          <section className="rounded-2xl border border-border overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -258,7 +261,7 @@ const LeaderboardPage: FC = () => {
                 )}
               </TableBody>
             </Table>
-          </div>
+          </section>
         )}
       </div>
     </Layout>
