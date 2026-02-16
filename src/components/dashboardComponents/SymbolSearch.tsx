@@ -287,7 +287,6 @@ const SymbolSearch = () => {
   return (
     <div className="w-full bg-card mt-2 border border-border rounded-lg shadow-sm">
       <div className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Search Symbol</h2>
         <div className="flex flex-col gap-4">
           <div className="relative" ref={suggestionsRef}>
             <InputComponent

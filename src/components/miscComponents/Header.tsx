@@ -19,6 +19,8 @@ import { toast } from "react-toastify";
 const menus: { title: string; href: string }[] = [
   { title: "Learn", href: "/learn" },
   { title: "Blogs", href: "/blogs" },
+  { title: "Challenge", href: "/challenge" },
+  { title: "Leaderboard", href: "/leaderboard" },
 ];
 
 interface HeaderProps {}

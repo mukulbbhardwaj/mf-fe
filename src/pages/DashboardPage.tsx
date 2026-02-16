@@ -166,12 +166,6 @@ const DashboardPage: FC<DashboardPageProps> = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Search & Holdings */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Search Section */}
-            <div className="border border-border rounded-lg p-6 bg-card">
-              <h2 className="text-xl font-semibold mb-4">Search & Trade</h2>
-              <SymbolSearch />
-            </div>
-
             {/* Holdings Section */}
             <div className="border border-border rounded-lg p-6 bg-card">
               <div className="flex items-center justify-between mb-4">
@@ -212,7 +206,8 @@ const DashboardPage: FC<DashboardPageProps> = () => {
           </div>
 
           {/* Right Column - Watchlist & Transactions */}
-          <div className="space-y-6">
+          <div className="space-y-6">          
+            <SymbolSearch />
             <WatchlistSection />
             <TransactionsSection />
           </div>

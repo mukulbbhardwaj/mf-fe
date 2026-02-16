@@ -9,6 +9,8 @@ import LoginPage from "./pages/auth/LoginPage.tsx";
 import SignupPage from "./pages/auth/SignupPage.tsx";
 import DashboardPage from "./pages/DashboardPage.tsx";
 import LandingPage from "./pages/LandingPage.tsx";
+import ChallengePage from "./pages/ChallengePage.tsx";
+import LeaderboardPage from "./pages/LeaderboardPage.tsx";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -47,6 +49,18 @@ const router = createBrowserRouter([
   {
     path: "/modules/:id/chapter/:chapterID",
     element: <ChapterPage />,
+  },
+  {
+    path: "/challenge",
+    element: <ChallengePage />,
+  },
+  {
+    path: "/challenge/:id",
+    element: <ChallengePage />,
+  },
+  {
+    path: "/leaderboard",
+    element: <LeaderboardPage />,
   },
 ]);
 
