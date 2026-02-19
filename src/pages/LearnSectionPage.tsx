@@ -44,7 +44,7 @@ const LearnSectionPage: FC = () => {
         }, {});
         const list: CategoryInfo[] = Object.entries(byCategory)
           .filter(([, ls]) => ls.length > 0)
-          .map(([category], index) => ({
+          .map(([category]) => ({
             id: category,
             name: formatCategoryName(category),
             desc: `${byCategory[category].length} lesson${byCategory[category].length === 1 ? "" : "s"}`,

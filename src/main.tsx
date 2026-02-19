@@ -4,7 +4,7 @@ import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 // import BlogSectionPage from "./pages/BlogSectionPage.tsx";
-import LearnSectionPage from "./pages/LearnSectionPage.tsx";
+// import LearnSectionPage from "./pages/LearnSectionPage.tsx";
 import LessonPage from "./pages/LessonPage.tsx";
 import LoginPage from "./pages/auth/LoginPage.tsx";
 import SignupPage from "./pages/auth/SignupPage.tsx";
@@ -12,6 +12,7 @@ import DashboardPage from "./pages/DashboardPage.tsx";
 import LandingPage from "./pages/LandingPage.tsx";
 import ChallengePage from "./pages/ChallengePage.tsx";
 import LeaderboardPage from "./pages/LeaderboardPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -34,10 +35,10 @@ const router = createBrowserRouter([
     path: "/register",
     element: <SignupPage />,
   },
-  {
-    path: "/learn",
-    element: <LearnSectionPage />,
-  },
+  // {
+  //   path: "/learn",
+  //   element: <LearnSectionPage />,
+  // },
   // { path: "/blogs", element: <BlogSectionPage /> },
   {
     path: "/modules/:id",
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
   {
     path: "/leaderboard",
     element: <LeaderboardPage />,
+  },
+  {
+    path: "/profile",
+    element: <ProfilePage />,
   },
 ]);
 

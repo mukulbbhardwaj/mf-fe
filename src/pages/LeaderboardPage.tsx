@@ -8,6 +8,7 @@ import {
   type LeaderboardEntry,
   type MyRankEntry,
 } from "@/api/leaderboard";
+import { getChallengeLeaderboard, type ChallengeLeaderboardEntry } from "@/api/challenge";
 import {
   Table,
   TableBody,
@@ -60,6 +61,8 @@ const LeaderboardPage: FC = () => {
   const [myRank, setMyRank] = useState<MyRankEntry | null | "none">(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [challengeEntries, setChallengeEntries] = useState<ChallengeLeaderboardEntry[]>([]);
+  const [challengeLoading, setChallengeLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
@@ -87,6 +90,15 @@ const LeaderboardPage: FC = () => {
     }
     load();
   }, [selectedWeek]);
+
+  useEffect(() => {
+    if (!userStore.user) return;
+    setChallengeLoading(true);
+    getChallengeLeaderboard(50)
+      .then((res) => setChallengeEntries(res.entries))
+      .catch(() => setChallengeEntries([]))
+      .finally(() => setChallengeLoading(false));
+  }, [userStore.user]);
 
   const goPrevWeek = () => {
     if (!weekStartDate) return;
@@ -204,6 +216,9 @@ const LeaderboardPage: FC = () => {
           </div>
         ) : (
           <section className="rounded-2xl border border-border overflow-hidden">
+            <h2 className="text-sm font-medium text-muted-foreground px-4 pt-4">
+              Crypto paper trading · Weekly
+            </h2>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -263,6 +278,78 @@ const LeaderboardPage: FC = () => {
             </Table>
           </section>
         )}
+
+        {/* Market Replay leaderboard */}
+        <section className="pt-8 border-t border-border">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-amber-500" />
+            Market Replay
+          </h2>
+          <p className="text-muted-foreground text-sm mb-4">
+            Top players by total challenge score (BUY/SELL/HOLD on historical Indian stocks).
+          </p>
+          {challengeLoading ? (
+            <div className="flex items-center gap-2 py-8 text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span>Loading…</span>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-border overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-14">Rank</TableHead>
+                    <TableHead>Username</TableHead>
+                    <TableHead className="text-right">Total score</TableHead>
+                    <TableHead className="text-right">Correct</TableHead>
+                    <TableHead className="text-right">Attempts</TableHead>
+                    <TableHead className="text-right">Avg score</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {challengeEntries.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        No entries yet.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    challengeEntries.map((entry) => (
+                      <TableRow
+                        key={entry.userId}
+                        className={cn(
+                          entry.isCurrentUser && "bg-primary/10 border-primary/30"
+                        )}
+                      >
+                        <TableCell className="font-medium">#{entry.rank}</TableCell>
+                        <TableCell>
+                          {entry.username}
+                          {entry.isCurrentUser && (
+                            <span className="ml-2 text-xs text-muted-foreground">(you)</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {entry.totalScore >= 0 ? "+" : ""}
+                          {entry.totalScore.toFixed(1)}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground">
+                          {entry.correctCount}/{entry.totalAttempts}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground">
+                          {entry.totalAttempts}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground">
+                          {entry.averageScore >= 0 ? "+" : ""}
+                          {entry.averageScore.toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </section>
       </div>
     </Layout>
   );

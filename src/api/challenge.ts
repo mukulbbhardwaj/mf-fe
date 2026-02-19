@@ -53,8 +53,21 @@ export interface ChallengeLeaderboardEntry {
   isCurrentUser?: boolean;
 }
 
+export type DifficultyFilter = "Easy" | "Medium" | "Hard";
+
 export const getRandomChallenge = async (): Promise<Challenge> => {
   const res = await apiClient.get("/api/challenge/random");
+  if (res.data.success && res.data.data) {
+    return res.data.data;
+  }
+  throw new Error(res.data.message || "Failed to fetch challenge");
+};
+
+export const getChallengeByFilter = async (
+  difficulty?: DifficultyFilter
+): Promise<Challenge> => {
+  const params = difficulty ? { difficulty } : undefined;
+  const res = await apiClient.get("/api/challenge/filter", { params });
   if (res.data.success && res.data.data) {
     return res.data.data;
   }

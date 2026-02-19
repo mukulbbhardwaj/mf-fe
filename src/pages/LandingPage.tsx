@@ -3,7 +3,6 @@ import Layout from "../Layout";
 import { Link } from "react-router-dom";
 import {
   TrendingUp,
-  BookOpen,
   // FileText,
   Gamepad2,
   Trophy,
@@ -19,7 +18,7 @@ const exploreCards: {
   iconColor: string;
 }[] = [
   { title: "Paper Trading", description: "Virtual portfolio, real data. Zero risk.", url: "/dashboard", icon: TrendingUp, iconColor: "text-emerald-400" },
-  { title: "Learn", description: "Lessons that decode markets.", url: "/learn", icon: BookOpen, iconColor: "text-sky-400" },
+  // { title: "Learn", description: "Lessons that decode markets.", url: "/learn", icon: BookOpen, iconColor: "text-sky-400" },
   { title: "Market Replay", description: "BUY · SELL · HOLD on real charts. Get scored.", url: "/challenge", icon: Gamepad2, iconColor: "text-amber-400" },
   { title: "Leaderboards", description: "Weekly rankings. Climb the board.", url: "/leaderboard", icon: Trophy, iconColor: "text-rose-400" },
 ];
@@ -49,14 +48,7 @@ const LandingPage: FC = () => {
               >
                 <Link to="/challenge">Play Market Replay</Link>
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="rounded-full px-8 h-12 text-base border-slate-500/40 bg-transparent hover:bg-slate-500/10 text-slate-300"
-              >
-                <Link to="/learn">Start learning</Link>
-              </Button>
+             
             </div>
           </div>
         </section>

@@ -39,9 +39,6 @@ const Header: FC<HeaderProps> = () => {
         <MainLogo />
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="default" size="sm" className="rounded-full hidden sm:inline-flex" asChild>
-          <Link to="/challenge">Play</Link>
-        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="hover:bg-accent">
@@ -63,6 +60,11 @@ const Header: FC<HeaderProps> = () => {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             {userStore.user ? (
               <>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer">
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" className="cursor-pointer">
                     Portfolio

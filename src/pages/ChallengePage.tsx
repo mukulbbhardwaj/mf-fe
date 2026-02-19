@@ -1,75 +1,88 @@
 import { FC, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Layout from "../Layout";
 import useStore from "@/store/userStore";
 import CandlestickChart from "@/components/challenge/CandlestickChart";
 import {
-  getRandomChallenge,
+  getChallengeByFilter,
   getChallengeById,
   submitChallenge,
   getChallengeStats,
-  getChallengeLeaderboard,
   type Challenge,
   type SubmitResult,
   type Decision,
   type ChallengeStats,
-  type ChallengeLeaderboardEntry,
+  type DifficultyFilter,
 } from "@/api/challenge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Loader2, TrendingUp, TrendingDown, Minus, Trophy } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Minus, Zap, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const DIFFICULTIES: { value: DifficultyFilter | null; label: string }[] = [
+  { value: "Easy", label: "Easy" },
+  { value: "Medium", label: "Medium" },
+  { value: "Hard", label: "Hard" },
+  { value: null, label: "Any" },
+];
 
 const ChallengePage: FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const userStore = useStore();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SubmitResult | null>(null);
   const [selectedDecision, setSelectedDecision] = useState<Decision | null>(null);
   const [stats, setStats] = useState<ChallengeStats | null>(null);
-  const [leaderboard, setLeaderboard] = useState<ChallengeLeaderboardEntry[]>([]);
-  const [statsLeaderboardLoading, setStatsLeaderboardLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyFilter | null>(null);
+  const [showDifficultyPicker, setShowDifficultyPicker] = useState(true);
 
-  const loadStatsAndLeaderboard = async () => {
-    setStatsLeaderboardLoading(true);
+  const loadStats = async () => {
+    setStatsLoading(true);
     try {
-      const [statsRes, boardRes] = await Promise.all([
-        getChallengeStats(),
-        getChallengeLeaderboard(50),
-      ]);
+      const statsRes = await getChallengeStats();
       setStats(statsRes);
-      setLeaderboard(boardRes.entries);
     } catch {
       setStats(null);
-      setLeaderboard([]);
     } finally {
-      setStatsLeaderboardLoading(false);
+      setStatsLoading(false);
     }
   };
 
-  const loadChallenge = async () => {
+  const loadChallengeByFilter = async (difficulty: DifficultyFilter | null) => {
     setLoading(true);
     setError(null);
     setResult(null);
     setSelectedDecision(null);
+    setShowDifficultyPicker(false);
     try {
-      const data = id
-        ? await getChallengeById(id)
-        : await getRandomChallenge();
+      const data = difficulty
+        ? await getChallengeByFilter(difficulty)
+        : await getChallengeByFilter();
       setChallenge(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load challenge");
+      setShowDifficultyPicker(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadChallengeById = async (challengeId: string) => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    setSelectedDecision(null);
+    setShowDifficultyPicker(false);
+    try {
+      const data = await getChallengeById(challengeId);
+      setChallenge(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load challenge");
+      setShowDifficultyPicker(true);
     } finally {
       setLoading(false);
     }
@@ -80,8 +93,14 @@ const ChallengePage: FC = () => {
       navigate("/login");
       return;
     }
-    loadChallenge();
-    loadStatsAndLeaderboard();
+    loadStats();
+    if (id) {
+      loadChallengeById(id);
+    } else {
+      setChallenge(null);
+      setShowDifficultyPicker(true);
+      setLoading(false);
+    }
   }, [id]);
 
   const handleSubmit = async () => {
@@ -91,7 +110,7 @@ const ChallengePage: FC = () => {
     try {
       const data = await submitChallenge(challenge.id, selectedDecision);
       setResult(data);
-      loadStatsAndLeaderboard();
+      loadStats();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to submit");
     } finally {
@@ -106,7 +125,7 @@ const ChallengePage: FC = () => {
     setError(null);
     navigate("/challenge");
     try {
-      const data = await getRandomChallenge();
+      const data = await getChallengeByFilter(selectedDifficulty ?? undefined);
       setChallenge(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load challenge");
@@ -115,7 +134,62 @@ const ChallengePage: FC = () => {
     }
   };
 
+  const handleChangeDifficulty = () => {
+    setChallenge(null);
+    setResult(null);
+    setSelectedDecision(null);
+    setError(null);
+    setShowDifficultyPicker(true);
+    navigate("/challenge");
+  };
+
   if (!userStore.user) return null;
+
+  if (showDifficultyPicker && !id) {
+    return (
+      <Layout>
+        <div className="max-w-2xl mx-auto space-y-8">
+          <section className="text-center">
+            <h1 className="text-3xl font-bold tracking-tight">Market Replay</h1>
+            <p className="text-muted-foreground mt-2">
+              Choose a difficulty, then get a random chart to practice BUY, SELL, or HOLD.
+            </p>
+          </section>
+          <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-4">
+              Difficulty
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {DIFFICULTIES.map(({ value, label }) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => setSelectedDifficulty(value)}
+                  className={cn(
+                    "rounded-xl border-2 py-3 px-4 text-sm font-medium transition-all",
+                    selectedDifficulty === value
+                      ? "border-teal-500 bg-teal-500/15 text-teal-400"
+                      : "border-border bg-card hover:border-muted-foreground/50 hover:bg-card-hovered"
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {error && <p className="text-destructive text-sm mt-4">{error}</p>}
+            <Button
+              size="lg"
+              className="mt-6 w-full sm:w-auto rounded-full px-8 bg-teal-600 hover:bg-teal-500"
+              onClick={() => loadChallengeByFilter(selectedDifficulty)}
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              Start challenge
+            </Button>
+          </section>
+        </div>
+      </Layout>
+    );
+  }
 
   if (loading && !challenge) {
     return (
@@ -132,10 +206,15 @@ const ChallengePage: FC = () => {
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
-          <p className="text-destructive">{error}</p>
-          <Button variant="outline" onClick={() => loadChallenge()}>
-            Try again
-          </Button>
+          <p className="text-destructive text-center">{error}</p>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => loadChallengeByFilter(selectedDifficulty)}>
+              Try again
+            </Button>
+            <Button variant="ghost" onClick={handleChangeDifficulty}>
+              Change difficulty
+            </Button>
+          </div>
         </div>
       </Layout>
     );
@@ -244,94 +323,42 @@ const ChallengePage: FC = () => {
                 {result.profitPercent.toFixed(2)}%
               </span>
             </div>
-            <Button onClick={handleNext} className="rounded-full px-6">
-              Next challenge
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={handleNext} className="rounded-full px-6">
+                Next challenge
+              </Button>
+              <Button variant="outline" onClick={handleChangeDifficulty} className="rounded-full px-6">
+                <Target className="mr-2 h-4 w-4" />
+                Change difficulty
+              </Button>
+            </div>
           </section>
         )}
 
-        {/* Your challenge stats & leaderboard */}
-        {!statsLeaderboardLoading && (stats || leaderboard.length > 0) && (
-          <section className="space-y-6 pt-6 border-t border-border">
-            {stats && (
-              <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
-                <h2 className="text-sm font-medium text-muted-foreground mb-2">
-                  Your challenge stats
-                </h2>
-                <div className="flex flex-wrap gap-4">
-                  <span className="font-semibold">
-                    Total score: {stats.totalScore >= 0 ? "+" : ""}
-                    {stats.totalScore.toFixed(1)}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Correct: {stats.correctCount}/{stats.totalAttempts}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Avg score: {stats.averageScore >= 0 ? "+" : ""}
-                    {stats.averageScore.toFixed(2)}
-                  </span>
-                </div>
+        {/* Your challenge stats */}
+        {!statsLoading && stats && (
+          <section className="pt-6 border-t border-border">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+              <h2 className="text-sm font-medium text-muted-foreground mb-2">
+                Your challenge stats
+              </h2>
+              <div className="flex flex-wrap gap-4">
+                <span className="font-semibold">
+                  Total score: {stats.totalScore >= 0 ? "+" : ""}
+                  {stats.totalScore.toFixed(1)}
+                </span>
+                <span className="text-muted-foreground">
+                  Correct: {stats.correctCount}/{stats.totalAttempts}
+                </span>
+                <span className="text-muted-foreground">
+                  Avg score: {stats.averageScore >= 0 ? "+" : ""}
+                  {stats.averageScore.toFixed(2)}
+                </span>
               </div>
-            )}
-
-            {/* Challenge leaderboard */}
-            {leaderboard.length > 0 && (
-              <div className="rounded-2xl border border-border overflow-hidden">
-                <h2 className="text-sm font-medium text-muted-foreground px-4 pt-4 flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-amber-500" />
-                  Challenge leaderboard
-                </h2>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-14">Rank</TableHead>
-                      <TableHead>Username</TableHead>
-                      <TableHead className="text-right">Total score</TableHead>
-                      <TableHead className="text-right">Correct</TableHead>
-                      <TableHead className="text-right">Attempts</TableHead>
-                      <TableHead className="text-right">Avg score</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {leaderboard.map((entry) => (
-                      <TableRow
-                        key={entry.userId}
-                        className={cn(
-                          entry.isCurrentUser &&
-                            "bg-primary/10 border-primary/30"
-                        )}
-                      >
-                        <TableCell className="font-medium">
-                          #{entry.rank}
-                        </TableCell>
-                        <TableCell>
-                          {entry.username}
-                          {entry.isCurrentUser && (
-                            <span className="ml-2 text-xs text-muted-foreground">
-                              (you)
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          {entry.totalScore >= 0 ? "+" : ""}
-                          {entry.totalScore.toFixed(1)}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {entry.correctCount}/{entry.totalAttempts}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {entry.totalAttempts}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {entry.averageScore >= 0 ? "+" : ""}
-                          {entry.averageScore.toFixed(2)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+              <Link to="/leaderboard" className="text-sm text-teal-400 hover:underline mt-2 inline-block">
+                View leaderboard →
+              </Link>
+            </div>
           </section>
         )}
       </div>
