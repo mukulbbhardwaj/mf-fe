@@ -11,6 +11,7 @@ import SignupPage from "./pages/auth/SignupPage.tsx";
 import DashboardPage from "./pages/DashboardPage.tsx";
 import LandingPage from "./pages/LandingPage.tsx";
 import ChallengePage from "./pages/ChallengePage.tsx";
+import TradeChallengePage from "./pages/TradeChallengePage.tsx";
 import LeaderboardPage from "./pages/LeaderboardPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
   {
     path: "/challenge/:id",
     element: <ChallengePage />,
+  },
+  {
+    path: "/challenge/trade",
+    element: <TradeChallengePage />,
   },
   {
     path: "/leaderboard",

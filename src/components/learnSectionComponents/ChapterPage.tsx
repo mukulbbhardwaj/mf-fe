@@ -17,7 +17,7 @@ const ChapterPage: FC<ChapterPageProps> = () => {
     <div>
       <div className="flex flex-col justify-between lg:flex-row border-b ">
         <div className="">
-          <div className="border-b-2 border-green w-max link">
+          <div className="border-b-2 border-primary w-max link">
             {modules[parseInt(id!)].id}. {modules[parseInt(id!)].name}
           </div>
           <div className="my-4 text-4xl font-bold">

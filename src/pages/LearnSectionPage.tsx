@@ -5,10 +5,10 @@ import { getLessons, type Lesson } from "@/api/lessons";
 import { Loader2 } from "lucide-react";
 
 const CATEGORY_COLORS: Record<string, string> = {
-  BASICS: "green",
-  TECHNICAL_ANALYSIS: "blue",
-  FUNDAMENTAL_ANALYSIS: "violet",
-  RISK_MANAGEMENT: "amber",
+  BASICS: "primary",
+  TECHNICAL_ANALYSIS: "energy-orange",
+  FUNDAMENTAL_ANALYSIS: "elite",
+  RISK_MANAGEMENT: "border",
 };
 
 function formatCategoryName(category: string): string {

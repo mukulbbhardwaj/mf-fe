@@ -3,11 +3,15 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const COLOR_BORDER: Record<string, string> = {
-  green: "border-green-500",
-  blue: "border-blue-500",
-  violet: "border-violet-500",
-  amber: "border-amber-500",
+  primary: "border-primary",
+  "energy-orange": "border-energy-orange",
+  elite: "border-elite",
   border: "border-border",
+  green: "border-primary",
+  line2: "border-border",
+  blue: "border-energy-orange",
+  violet: "border-elite",
+  amber: "border-border",
 };
 
 interface ModuleProps {

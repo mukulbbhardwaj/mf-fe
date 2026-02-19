@@ -7,6 +7,7 @@ import {
   Gamepad2,
   Trophy,
   ArrowRight,
+  Target,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,36 +18,40 @@ const exploreCards: {
   icon: FC<{ className?: string }>;
   iconColor: string;
 }[] = [
-  { title: "Paper Trading", description: "Virtual portfolio, real data. Zero risk.", url: "/dashboard", icon: TrendingUp, iconColor: "text-emerald-400" },
-  // { title: "Learn", description: "Lessons that decode markets.", url: "/learn", icon: BookOpen, iconColor: "text-sky-400" },
-  { title: "Market Replay", description: "BUY · SELL · HOLD on real charts. Get scored.", url: "/challenge", icon: Gamepad2, iconColor: "text-amber-400" },
-  { title: "Leaderboards", description: "Weekly rankings. Climb the board.", url: "/leaderboard", icon: Trophy, iconColor: "text-rose-400" },
+  { title: "Paper Trading", description: "Virtual portfolio, real data. Zero risk.", url: "/dashboard", icon: TrendingUp, iconColor: "text-primary" },
+  // { title: "Learn", description: "Lessons that decode markets.", url: "/learn", icon: BookOpen, iconColor: "text-primary" },
+  { title: "Chart Challenge", description: "BUY · SELL · HOLD on real charts. Get scored.", url: "/challenge", icon: Gamepad2, iconColor: "text-energy-orange" },
+  { title: "Trade Challenge", description: "LONG/SHORT with entry, SL & TP. See the replay.", url: "/challenge/trade", icon: Target, iconColor: "text-elite" },
+  { title: "Leaderboards", description: "Top Monke rankings. Climb the board.", url: "/leaderboard", icon: Trophy, iconColor: "text-elite" },
 ];
 
 const LandingPage: FC = () => {
   return (
     <Layout>
       <div className="flex flex-col items-center w-full max-w-3xl mx-auto px-2">
-        {/* Hero — centered, subtle teal glow */}
+        {/* Hero — centered, subtle primary (neon green) glow */}
         <section className="relative py-20 lg:py-28 w-full text-center">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(45,212,191,0.08),transparent_50%)]" />
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(0,255,156,0.08),transparent_50%)]" />
           <div className="mx-auto max-w-2xl">
-            <p className="text-sm font-medium uppercase tracking-widest mb-4 animate-fade-in text-teal-400/80">
+            <p className="text-sm font-medium uppercase tracking-widest mb-4 animate-fade-in text-primary/90">
               Learn. Trade. Repeat.
             </p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-foreground mb-6 animate-fade-in">
               Finance without the fear.
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-10 mx-auto max-w-md animate-fade-in">
+            <p className="text-lg text-muted-foreground leading-relaxed mb-2 mx-auto max-w-md animate-fade-in">
               Paper trade, replay historical charts, and learn with lessons built for real decisions.
+            </p>
+            <p className="text-base text-primary font-medium mb-10 animate-fade-in">
+              Ready to train? Charts waiting.
             </p>
             <div className="flex flex-wrap justify-center gap-3 animate-fade-in">
               <Button
                 asChild
                 size="lg"
-                className="rounded-full px-8 h-12 text-base bg-teal-600 hover:bg-teal-500 text-white border-0"
+                className="rounded-full px-8 h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground border-0"
               >
-                <Link to="/challenge">Play Market Replay</Link>
+                <Link to="/challenge">Play Chart Challenge</Link>
               </Button>
              
             </div>
@@ -54,7 +59,7 @@ const LandingPage: FC = () => {
         </section>
 
         {/* Divider — subtle color */}
-        <div className="h-px w-full max-w-md mx-auto bg-gradient-to-r from-transparent via-teal-500/30 to-transparent my-4" />
+        <div className="h-px w-full max-w-md mx-auto bg-gradient-to-r from-transparent via-primary/30 to-transparent my-4" />
 
         {/* Explore — simple list */}
         <section className="py-16 lg:py-20 w-full">
@@ -78,7 +83,7 @@ const LandingPage: FC = () => {
                     <span className="font-medium text-foreground block">{card.title}</span>
                     <span className="text-sm text-muted-foreground block truncate">{card.description}</span>
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/40 group-hover:text-teal-400 group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                 </Link>
               );
             })}
@@ -87,23 +92,23 @@ const LandingPage: FC = () => {
 
         {/* Bottom CTA — centered, subtle tint */}
         <section className="py-16 lg:py-20 w-full">
-          <div className="rounded-2xl border border-teal-500/20 bg-teal-500/5 p-8 sm:p-12 text-center max-w-2xl mx-auto">
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 sm:p-12 text-center max-w-2xl mx-auto">
             <p className="text-muted-foreground text-lg sm:text-xl max-w-lg mx-auto mb-8">
-              Practice with real data. No real money. Just real skills.
+              Practice with real data. No real money. Just real skills. Train your Monke.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button
                 asChild
                 size="lg"
-                className="rounded-full px-8 bg-teal-600 hover:bg-teal-500 text-white border-0"
+                className="rounded-full px-8 bg-primary hover:bg-primary/90 text-primary-foreground border-0"
               >
-                <Link to="/challenge">Try Market Replay</Link>
+                <Link to="/challenge">Try Chart Challenge</Link>
               </Button>
               <Button
                 asChild
                 variant="ghost"
                 size="lg"
-                className="rounded-full px-8 text-slate-400 hover:text-foreground hover:bg-slate-500/10"
+                className="rounded-full px-8 text-muted-foreground hover:text-foreground hover:bg-muted"
               >
                 <Link to="/dashboard">Open paper portfolio</Link>
               </Button>

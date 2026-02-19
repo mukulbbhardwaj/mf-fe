@@ -90,7 +90,7 @@ const ProfilePage: FC = () => {
       <div className="max-w-4xl mx-auto">
         {/* Profile header */}
         <section className="relative rounded-2xl overflow-hidden mb-8">
-          <div className="absolute inset-0 bg-gradient-to-br from-teal-500/20 via-slate-500/10 to-amber-500/10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-muted/20 to-energy-orange/10" />
           <div className="relative px-6 py-8 sm:px-8 sm:py-10">
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/80 text-2xl font-bold text-primary-foreground shadow-lg">
@@ -103,6 +103,7 @@ const ProfilePage: FC = () => {
                 <p className="text-sm text-muted-foreground mt-0.5">
                   {userStore.user.email}
                 </p>
+                <p className="text-xs text-primary/90 mt-1">Your Monke. Your progress.</p>
               </div>
             </div>
           </div>
@@ -115,22 +116,22 @@ const ProfilePage: FC = () => {
         {loading ? (
           <div className="flex items-center justify-center py-20 gap-2 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Loading your stats…</span>
+            <span>Loading your Monke stats…</span>
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2">
             {/* Portfolio at a glance */}
             <Link
               to="/dashboard"
-              className="group block rounded-2xl border border-border bg-card overflow-hidden hover:bg-card-hovered hover:border-teal-500/30 transition-all duration-200"
+              className="group block rounded-2xl border border-border bg-card overflow-hidden hover:bg-card-hovered hover:border-primary/30 transition-all duration-200"
             >
               <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <Wallet className="h-4 w-4 text-teal-400" />
+                    <Wallet className="h-4 w-4 text-primary" />
                     Portfolio
                   </span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-teal-400 group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                 </div>
                 {portfolio ? (
                   <>
@@ -145,8 +146,8 @@ const ProfilePage: FC = () => {
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-medium",
                           isPositiveReturn
-                            ? "bg-emerald-500/15 text-emerald-400"
-                            : "bg-red-500/15 text-red-400"
+                            ? "bg-profit/15 text-profit"
+                            : "bg-loss/15 text-loss"
                         )}
                       >
                         <TrendingUp className="h-3.5 w-3.5" />
@@ -171,15 +172,15 @@ const ProfilePage: FC = () => {
             {/* Challenge performance */}
             <Link
               to="/challenge"
-              className="group block rounded-2xl border border-border bg-card overflow-hidden hover:bg-card-hovered hover:border-amber-500/30 transition-all duration-200"
+              className="group block rounded-2xl border border-border bg-card overflow-hidden hover:bg-card-hovered hover:border-energy-orange/30 transition-all duration-200"
             >
               <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <Gamepad2 className="h-4 w-4 text-amber-400" />
-                    Market Replay
+                    <Gamepad2 className="h-4 w-4 text-energy-orange" />
+                    Chart Challenge
                   </span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-energy-orange group-hover:translate-x-0.5 transition-all" />
                 </div>
                 {challengeStats ? (
                   <>
@@ -192,9 +193,9 @@ const ProfilePage: FC = () => {
                     </div>
                     <div className="mt-4 flex flex-wrap items-center gap-3">
                       {challengeRank != null && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-sm font-medium text-amber-400">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-energy-orange/15 px-2.5 py-0.5 text-sm font-medium text-energy-orange">
                           <Award className="h-3.5 w-3.5" />
-                          Rank #{challengeRank}
+                          {challengeRank === 1 ? "Top Monke" : `Rank #${challengeRank}`}
                         </span>
                       )}
                       <span className="text-sm text-muted-foreground">
@@ -208,7 +209,7 @@ const ProfilePage: FC = () => {
                   </>
                 ) : (
                   <p className="text-muted-foreground text-sm">
-                    No challenges played yet. Play Market Replay to get ranked.
+                    Your Monke hasn&apos;t played yet. Play Chart Challenge to get on the board.
                   </p>
                 )}
               </div>
@@ -224,23 +225,23 @@ const ProfilePage: FC = () => {
           <div className="flex flex-wrap gap-3">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium hover:bg-card-hovered hover:border-teal-500/30 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium hover:bg-card-hovered hover:border-primary/30 transition-colors"
             >
-              <BarChart3 className="h-4 w-4 text-teal-400" />
+              <BarChart3 className="h-4 w-4 text-primary" />
               Full portfolio
             </Link>
             <Link
               to="/challenge"
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium hover:bg-card-hovered hover:border-amber-500/30 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium hover:bg-card-hovered hover:border-energy-orange/30 transition-colors"
             >
-              <Target className="h-4 w-4 text-amber-400" />
-              Play challenge
+              <Target className="h-4 w-4 text-energy-orange" />
+              Play Chart Challenge
             </Link>
             <Link
               to="/leaderboard"
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium hover:bg-card-hovered hover:border-rose-500/30 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium hover:bg-card-hovered hover:border-elite/30 transition-colors"
             >
-              <Award className="h-4 w-4 text-rose-400" />
+              <Award className="h-4 w-4 text-elite" />
               View leaderboard
             </Link>
           </div>

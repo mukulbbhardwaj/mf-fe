@@ -25,6 +25,26 @@ const DIFFICULTIES: { value: DifficultyFilter | null; label: string }[] = [
   { value: null, label: "Any" },
 ];
 
+const MONKE_WIN_MESSAGES = [
+  "Clean trade. Monke impressed.",
+  "Bananas secured.",
+  "Professional behavior.",
+  "Skill increased.",
+];
+const MONKE_LOSS_MESSAGES = [
+  "Monke sad. Risk management needed.",
+  "Greed detected.",
+  "Review your strategy.",
+  "Discipline required.",
+];
+
+function getMonkeMessage(correct: boolean, score: number): string {
+  if (correct) {
+    return MONKE_WIN_MESSAGES[Math.abs(Math.floor(score)) % MONKE_WIN_MESSAGES.length];
+  }
+  return MONKE_LOSS_MESSAGES[Math.abs(Math.floor(score)) % MONKE_LOSS_MESSAGES.length];
+}
+
 const ChallengePage: FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -150,9 +170,9 @@ const ChallengePage: FC = () => {
       <Layout>
         <div className="max-w-2xl mx-auto space-y-8">
           <section className="text-center">
-            <h1 className="text-3xl font-bold tracking-tight">Market Replay</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Chart Challenge</h1>
             <p className="text-muted-foreground mt-2">
-              Choose a difficulty, then get a random chart to practice BUY, SELL, or HOLD.
+              Ready to train? Choose a difficulty, then get a random chart to practice BUY, SELL, or HOLD.
             </p>
           </section>
           <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
@@ -168,7 +188,7 @@ const ChallengePage: FC = () => {
                   className={cn(
                     "rounded-xl border-2 py-3 px-4 text-sm font-medium transition-all",
                     selectedDifficulty === value
-                      ? "border-teal-500 bg-teal-500/15 text-teal-400"
+                      ? "border-primary bg-primary/15 text-primary"
                       : "border-border bg-card hover:border-muted-foreground/50 hover:bg-card-hovered"
                   )}
                 >
@@ -177,14 +197,22 @@ const ChallengePage: FC = () => {
               ))}
             </div>
             {error && <p className="text-destructive text-sm mt-4">{error}</p>}
-            <Button
-              size="lg"
-              className="mt-6 w-full sm:w-auto rounded-full px-8 bg-teal-600 hover:bg-teal-500"
-              onClick={() => loadChallengeByFilter(selectedDifficulty)}
-            >
-              <Zap className="mr-2 h-4 w-4" />
-              Start challenge
-            </Button>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Button
+                size="lg"
+                className="rounded-full px-8 bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={() => loadChallengeByFilter(selectedDifficulty)}
+              >
+                <Zap className="mr-2 h-4 w-4" />
+                Start challenge
+              </Button>
+              <Link
+                to="/challenge/trade"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Or try Trade Challenge (LONG/SHORT + SL/TP) →
+              </Link>
+            </div>
           </section>
         </div>
       </Layout>
@@ -196,7 +224,7 @@ const ChallengePage: FC = () => {
       <Layout>
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <p className="text-muted-foreground">Loading challenge…</p>
+          <p className="text-muted-foreground">Monke is loading the chart…</p>
         </div>
       </Layout>
     );
@@ -223,7 +251,7 @@ const ChallengePage: FC = () => {
   if (!challenge) return null;
 
   const allCandles = result
-    ? [...challenge.snapshotCandles, ...result.outcomeCandles]
+    ? [...challenge.snapshotCandles, ...result.forwardCandles]
     : challenge.snapshotCandles;
   const outcomeStartIndex = result ? challenge.snapshotCandles.length : undefined;
 
@@ -231,7 +259,7 @@ const ChallengePage: FC = () => {
     <Layout>
       <div className="max-w-4xl mx-auto space-y-8">
         <section>
-          <h1 className="text-3xl font-bold tracking-tight">Market Replay</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Chart Challenge</h1>
           <p className="text-muted-foreground mt-2 max-w-xl">
             Practice with historical Indian stock data. View the chart, choose BUY, SELL, or HOLD, then see how you scored.
           </p>
@@ -314,6 +342,12 @@ const ChallengePage: FC = () => {
                 {result.score.toFixed(1)}
               </span>
             </div>
+            <p className={cn(
+              "font-medium",
+              result.correct ? "text-profit/90" : "text-loss/90"
+            )}>
+              {getMonkeMessage(result.correct, result.score)}
+            </p>
             <p className="text-muted-foreground">{result.explanation}</p>
             <div className="flex gap-4 text-sm">
               <span>Your choice: {result.userDirection}</span>
@@ -355,7 +389,7 @@ const ChallengePage: FC = () => {
                   {stats.averageScore.toFixed(2)}
                 </span>
               </div>
-              <Link to="/leaderboard" className="text-sm text-teal-400 hover:underline mt-2 inline-block">
+              <Link to="/leaderboard" className="text-sm text-primary hover:underline mt-2 inline-block">
                 View leaderboard →
               </Link>
             </div>

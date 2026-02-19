@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 const footerLinks: { label: string; to: string }[] = [
   { label: "Learn", to: "/learn" },
   // { label: "Blogs", to: "/blogs" },
-  { label: "Market Replay", to: "/challenge" },
+  { label: "Chart Challenge", to: "/challenge" },
+  { label: "Trade Challenge", to: "/challenge/trade" },
   { label: "Leaderboard", to: "/leaderboard" },
 ];
 

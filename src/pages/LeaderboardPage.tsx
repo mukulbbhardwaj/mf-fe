@@ -52,19 +52,24 @@ function isCurrentOrPastWeek(weekStartISO: string): boolean {
   return monday.getTime() <= currentMonday.getTime();
 }
 
+type LeaderboardTab = "market-replay" | "crypto";
+
 const LeaderboardPage: FC = () => {
   const navigate = useNavigate();
   const userStore = useStore();
+  const [activeTab, setActiveTab] = useState<LeaderboardTab>("market-replay");
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null);
   const [weekStartDate, setWeekStartDate] = useState<string | null>(null);
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [myRank, setMyRank] = useState<MyRankEntry | null | "none">(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [challengeEntries, setChallengeEntries] = useState<ChallengeLeaderboardEntry[]>([]);
-  const [challengeLoading, setChallengeLoading] = useState(true);
+  const [challengeLoading, setChallengeLoading] = useState(false);
+  const [challengeLoaded, setChallengeLoaded] = useState(false);
+  const [cryptoLoaded, setCryptoLoaded] = useState(false);
 
-  const load = async () => {
+  const loadCrypto = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -76,10 +81,24 @@ const LeaderboardPage: FC = () => {
       setWeekStartDate(boardRes.weekStartDate);
       setEntries(boardRes.entries);
       setMyRank(meRes.entry ?? "none");
+      setCryptoLoaded(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load leaderboard");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadChallenge = async () => {
+    setChallengeLoading(true);
+    try {
+      const res = await getChallengeLeaderboard(50);
+      setChallengeEntries(res.entries);
+      setChallengeLoaded(true);
+    } catch {
+      setChallengeEntries([]);
+    } finally {
+      setChallengeLoading(false);
     }
   };
 
@@ -88,17 +107,22 @@ const LeaderboardPage: FC = () => {
       navigate("/login");
       return;
     }
-    load();
-  }, [selectedWeek]);
+  }, [userStore.user, navigate]);
 
   useEffect(() => {
-    if (!userStore.user) return;
-    setChallengeLoading(true);
-    getChallengeLeaderboard(50)
-      .then((res) => setChallengeEntries(res.entries))
-      .catch(() => setChallengeEntries([]))
-      .finally(() => setChallengeLoading(false));
-  }, [userStore.user]);
+    if (!userStore.user || activeTab !== "market-replay") return;
+    if (!challengeLoaded) loadChallenge();
+  }, [userStore.user, activeTab, challengeLoaded]);
+
+  useEffect(() => {
+    if (!userStore.user || activeTab !== "crypto") return;
+    if (!cryptoLoaded) loadCrypto();
+  }, [userStore.user, activeTab, cryptoLoaded]);
+
+  useEffect(() => {
+    if (activeTab !== "crypto" || !cryptoLoaded) return;
+    loadCrypto();
+  }, [selectedWeek]);
 
   const goPrevWeek = () => {
     if (!weekStartDate) return;
@@ -120,236 +144,267 @@ const LeaderboardPage: FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-6">
         <section>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Trophy className="h-8 w-8 text-amber-500" />
+            <Trophy className="h-8 w-8 text-energy-orange" />
             Leaderboard
           </h1>
           <p className="text-muted-foreground mt-2 max-w-xl">
-            Weekly crypto paper trading rankings. Score = Total Return % − Max Drawdown %. Higher is better.
+            Climb the board. Become Top Monke.
           </p>
           <Link to="/challenge" className="text-sm text-primary hover:underline mt-2 inline-block">
-            Play Market Replay →
+            Play Chart Challenge →
           </Link>
         </section>
 
-        {weekStartDate && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-muted-foreground">Week of</span>
-            <span className="font-medium">{formatWeekLabel(weekStartDate)}</span>
-            <div className="flex gap-1 ml-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-                onClick={goPrevWeek}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-                onClick={goNextWeek}
-                disabled={!canGoNext}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-            {selectedWeek && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedWeek(null)}
-              >
-                Current week
-              </Button>
+        {/* Tabs: Chart Challenge (default) + Crypto */}
+        <div className="flex gap-1 p-1 rounded-xl bg-muted/60 border border-border/80 w-fit">
+          <button
+            type="button"
+            onClick={() => setActiveTab("market-replay")}
+            className={cn(
+              "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+              activeTab === "market-replay"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             )}
-          </div>
-        )}
+          >
+            Chart Challenge
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("crypto")}
+            className={cn(
+              "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+              activeTab === "crypto"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Crypto · Weekly
+          </button>
+        </div>
 
-        {myRank !== null && myRank !== "none" && (
-          <section className="rounded-2xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="text-sm font-medium text-muted-foreground mb-2">
-              Your rank
-            </h2>
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="text-xl font-semibold">#{myRank.rank}</span>
-              <span className="text-muted-foreground">{myRank.username}</span>
-              <span>
-                Return:{" "}
-                <span
-                  className={cn(
-                    myRank.totalReturn >= 0 ? "text-profit" : "text-loss"
-                  )}
-                >
-                  {myRank.totalReturn >= 0 ? "+" : ""}
-                  {myRank.totalReturn.toFixed(2)}%
-                </span>
-              </span>
-              <span className="text-muted-foreground">
-                Max DD: {myRank.maxDrawdown.toFixed(2)}%
-              </span>
-              <span className="font-medium">
-                Score: {myRank.score >= 0 ? "+" : ""}
-                {myRank.score.toFixed(2)}
-              </span>
-            </div>
-          </section>
-        )}
-
-        {myRank === "none" && weekStartDate && (
-          <p className="text-muted-foreground text-sm">
-            No stats for this week yet. Trade to get ranked.
-          </p>
-        )}
-
-        {error && (
-          <p className="text-destructive">{error}</p>
-        )}
-
-        {loading ? (
-          <div className="flex items-center justify-center py-12 gap-2">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            <span className="text-muted-foreground">Loading…</span>
-          </div>
-        ) : (
-          <section className="rounded-2xl border border-border overflow-hidden">
-            <h2 className="text-sm font-medium text-muted-foreground px-4 pt-4">
-              Crypto paper trading · Weekly
-            </h2>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16">Rank</TableHead>
-                  <TableHead>Username</TableHead>
-                  <TableHead className="text-right">Return %</TableHead>
-                  <TableHead className="text-right">Max DD %</TableHead>
-                  <TableHead className="text-right">Score</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {entries.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      No entries for this week.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  entries.map((entry) => (
-                    <TableRow
-                      key={entry.userId}
-                      className={cn(
-                        entry.isCurrentUser && "bg-primary/10 border-primary/30"
-                      )}
-                    >
-                      <TableCell className="font-medium">
-                        #{entry.rank}
-                      </TableCell>
-                      <TableCell>
-                        {entry.username}
-                        {entry.isCurrentUser && (
-                          <span className="ml-2 text-xs text-muted-foreground">
-                            (you)
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell
-                        className={cn(
-                          "text-right",
-                          entry.totalReturn >= 0 ? "text-profit" : "text-loss"
-                        )}
-                      >
-                        {entry.totalReturn >= 0 ? "+" : ""}
-                        {entry.totalReturn.toFixed(2)}%
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {entry.maxDrawdown.toFixed(2)}%
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {entry.score >= 0 ? "+" : ""}
-                        {entry.score.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </section>
-        )}
-
-        {/* Market Replay leaderboard */}
-        <section className="pt-8 border-t border-border">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-amber-500" />
-            Market Replay
-          </h2>
-          <p className="text-muted-foreground text-sm mb-4">
-            Top players by total challenge score (BUY/SELL/HOLD on historical Indian stocks).
-          </p>
-          {challengeLoading ? (
-            <div className="flex items-center gap-2 py-8 text-muted-foreground">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span>Loading…</span>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-border overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-14">Rank</TableHead>
-                    <TableHead>Username</TableHead>
-                    <TableHead className="text-right">Total score</TableHead>
-                    <TableHead className="text-right">Correct</TableHead>
-                    <TableHead className="text-right">Attempts</TableHead>
-                    <TableHead className="text-right">Avg score</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {challengeEntries.length === 0 ? (
+        {/* Chart Challenge tab (default) */}
+        {activeTab === "market-replay" && (
+          <section className="space-y-4">
+            <p className="text-muted-foreground text-sm">
+              Top Monkes by challenge score (BUY/SELL/HOLD on historical Indian stocks).
+            </p>
+            {challengeLoading ? (
+              <div className="flex items-center justify-center py-12 gap-2 rounded-2xl border border-border bg-card/30">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <span className="text-muted-foreground">Loading…</span>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-border overflow-hidden">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        No entries yet.
-                      </TableCell>
+                      <TableHead className="w-14">Rank</TableHead>
+                      <TableHead>Username</TableHead>
+                      <TableHead className="text-right">Total score</TableHead>
+                      <TableHead className="text-right">Correct</TableHead>
+                      <TableHead className="text-right">Attempts</TableHead>
+                      <TableHead className="text-right">Avg score</TableHead>
                     </TableRow>
-                  ) : (
-                    challengeEntries.map((entry) => (
-                      <TableRow
-                        key={entry.userId}
-                        className={cn(
-                          entry.isCurrentUser && "bg-primary/10 border-primary/30"
-                        )}
-                      >
-                        <TableCell className="font-medium">#{entry.rank}</TableCell>
-                        <TableCell>
-                          {entry.username}
-                          {entry.isCurrentUser && (
-                            <span className="ml-2 text-xs text-muted-foreground">(you)</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          {entry.totalScore >= 0 ? "+" : ""}
-                          {entry.totalScore.toFixed(1)}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {entry.correctCount}/{entry.totalAttempts}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {entry.totalAttempts}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {entry.averageScore >= 0 ? "+" : ""}
-                          {entry.averageScore.toFixed(2)}
+                  </TableHeader>
+                  <TableBody>
+                    {challengeEntries.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          No Monkes on the board yet.
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </section>
+                    ) : (
+                      challengeEntries.map((entry) => (
+                        <TableRow
+                          key={entry.userId}
+                          className={cn(
+                            entry.isCurrentUser && "bg-primary/10 border-primary/30"
+                          )}
+                        >
+                          <TableCell className="font-medium">
+                            {entry.rank === 1 ? "Top Monke" : `#${entry.rank}`}
+                          </TableCell>
+                          <TableCell>
+                            {entry.username}
+                            {entry.isCurrentUser && (
+                              <span className="ml-2 text-xs text-muted-foreground">(you)</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {entry.totalScore >= 0 ? "+" : ""}
+                            {entry.totalScore.toFixed(1)}
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground">
+                            {entry.correctCount}/{entry.totalAttempts}
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground">
+                            {entry.totalAttempts}
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground">
+                            {entry.averageScore >= 0 ? "+" : ""}
+                            {entry.averageScore.toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Crypto tab */}
+        {activeTab === "crypto" && (
+          <section className="space-y-6">
+            <p className="text-muted-foreground text-sm">
+              Weekly crypto paper trading. Score = Total Return % − Max Drawdown %. Higher is better.
+            </p>
+            {weekStartDate && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-muted-foreground">Week of</span>
+                <span className="font-medium">{formatWeekLabel(weekStartDate)}</span>
+                <div className="flex gap-1 ml-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={goPrevWeek}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={goNextWeek}
+                    disabled={!canGoNext}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+                {selectedWeek && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedWeek(null)}
+                  >
+                    Current week
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {myRank !== null && myRank !== "none" && (
+              <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+                <h2 className="text-sm font-medium text-muted-foreground mb-2">
+                  {myRank.rank === 1 ? "Top Monke" : "Your Monke rank"}
+                </h2>
+                <div className="flex flex-wrap items-center gap-4">
+                  <span className="text-xl font-semibold">
+                    {myRank.rank === 1 ? "Top Monke" : `#${myRank.rank}`}
+                  </span>
+                  <span className="text-muted-foreground">{myRank.username}</span>
+                  <span>
+                    Return:{" "}
+                    <span
+                      className={cn(
+                        myRank.totalReturn >= 0 ? "text-profit" : "text-loss"
+                      )}
+                    >
+                      {myRank.totalReturn >= 0 ? "+" : ""}
+                      {myRank.totalReturn.toFixed(2)}%
+                    </span>
+                  </span>
+                  <span className="text-muted-foreground">
+                    Max DD: {myRank.maxDrawdown.toFixed(2)}%
+                  </span>
+                  <span className="font-medium">
+                    Score: {myRank.score >= 0 ? "+" : ""}
+                    {myRank.score.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {myRank === "none" && weekStartDate && (
+              <p className="text-muted-foreground text-sm">
+                No stats for this week yet. Trade to get your Monke on the board.
+              </p>
+            )}
+
+            {error && <p className="text-destructive">{error}</p>}
+
+            {loading ? (
+              <div className="flex items-center justify-center py-12 gap-2 rounded-2xl border border-border bg-card/30">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <span className="text-muted-foreground">Loading…</span>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-16">Rank</TableHead>
+                      <TableHead>Username</TableHead>
+                      <TableHead className="text-right">Return %</TableHead>
+                      <TableHead className="text-right">Max DD %</TableHead>
+                      <TableHead className="text-right">Score</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {entries.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          No Monkes on the board this week.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      entries.map((entry) => (
+                        <TableRow
+                          key={entry.userId}
+                          className={cn(
+                            entry.isCurrentUser && "bg-primary/10 border-primary/30"
+                          )}
+                        >
+                          <TableCell className="font-medium">
+                            {entry.rank === 1 ? "Top Monke" : `#${entry.rank}`}
+                          </TableCell>
+                          <TableCell>
+                            {entry.username}
+                            {entry.isCurrentUser && (
+                              <span className="ml-2 text-xs text-muted-foreground">(you)</span>
+                            )}
+                          </TableCell>
+                          <TableCell
+                            className={cn(
+                              "text-right",
+                              entry.totalReturn >= 0 ? "text-profit" : "text-loss"
+                            )}
+                          >
+                            {entry.totalReturn >= 0 ? "+" : ""}
+                            {entry.totalReturn.toFixed(2)}%
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground">
+                            {entry.maxDrawdown.toFixed(2)}%
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {entry.score >= 0 ? "+" : ""}
+                            {entry.score.toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </Layout>
   );

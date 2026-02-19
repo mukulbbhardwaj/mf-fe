@@ -29,7 +29,8 @@ export interface SubmitResult {
   maxProfitPercent: number;
   maxLossPercent: number;
   explanation: string;
-  outcomeCandles: Candle[];
+  /** Forward window candles (max 250) after snapshot; use for replay. */
+  forwardCandles: Candle[];
 }
 
 export type Decision = "BUY" | "SELL" | "HOLD";
@@ -55,8 +56,10 @@ export interface ChallengeLeaderboardEntry {
 
 export type DifficultyFilter = "Easy" | "Medium" | "Hard";
 
+const BASE = "/api/direction-challenge";
+
 export const getRandomChallenge = async (): Promise<Challenge> => {
-  const res = await apiClient.get("/api/challenge/random");
+  const res = await apiClient.get(`${BASE}/random`);
   if (res.data.success && res.data.data) {
     return res.data.data;
   }
@@ -67,7 +70,7 @@ export const getChallengeByFilter = async (
   difficulty?: DifficultyFilter
 ): Promise<Challenge> => {
   const params = difficulty ? { difficulty } : undefined;
-  const res = await apiClient.get("/api/challenge/filter", { params });
+  const res = await apiClient.get(`${BASE}/filter`, { params });
   if (res.data.success && res.data.data) {
     return res.data.data;
   }
@@ -75,7 +78,7 @@ export const getChallengeByFilter = async (
 };
 
 export const getChallengeById = async (id: string): Promise<Challenge> => {
-  const res = await apiClient.get(`/api/challenge/${id}`);
+  const res = await apiClient.get(`${BASE}/${id}`);
   if (res.data.success && res.data.data) {
     return res.data.data;
   }
@@ -86,7 +89,7 @@ export const submitChallenge = async (
   challengeId: string,
   decision: Decision
 ): Promise<SubmitResult> => {
-  const res = await apiClient.post("/api/challenge/submit", {
+  const res = await apiClient.post(`${BASE}/submit`, {
     challengeId,
     decision,
   });
@@ -99,7 +102,7 @@ export const submitChallenge = async (
 export const getChallengeResult = async (
   attemptId: string
 ): Promise<Omit<SubmitResult, "attemptId">> => {
-  const res = await apiClient.get(`/api/challenge/result/${attemptId}`);
+  const res = await apiClient.get(`${BASE}/result/${attemptId}`);
   if (res.data.success && res.data.data) {
     return res.data.data;
   }
@@ -107,7 +110,7 @@ export const getChallengeResult = async (
 };
 
 export const getChallengeStats = async (): Promise<ChallengeStats> => {
-  const res = await apiClient.get("/api/challenge/stats");
+  const res = await apiClient.get(`${BASE}/stats`);
   if (res.data.success && res.data.data) {
     return res.data.data;
   }
@@ -118,7 +121,7 @@ export const getChallengeLeaderboard = async (
   limit?: number
 ): Promise<{ entries: ChallengeLeaderboardEntry[] }> => {
   const params = limit != null ? { limit } : undefined;
-  const res = await apiClient.get("/api/challenge/leaderboard", { params });
+  const res = await apiClient.get(`${BASE}/leaderboard`, { params });
   if (res.data.success && res.data.data) {
     return res.data.data;
   }

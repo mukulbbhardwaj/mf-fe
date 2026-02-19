@@ -7,17 +7,22 @@ import { Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_COLORS: Record<string, string> = {
-  BASICS: "green",
-  TECHNICAL_ANALYSIS: "blue",
-  FUNDAMENTAL_ANALYSIS: "violet",
-  RISK_MANAGEMENT: "amber",
+  BASICS: "primary",
+  TECHNICAL_ANALYSIS: "energy-orange",
+  FUNDAMENTAL_ANALYSIS: "elite",
+  RISK_MANAGEMENT: "border",
 };
 
 const BORDER_CLASS: Record<string, string> = {
-  green: "border-green-500",
-  blue: "border-blue-500",
-  violet: "border-violet-500",
-  amber: "border-amber-500",
+  primary: "border-primary",
+  "energy-orange": "border-energy-orange",
+  elite: "border-elite",
+  border: "border-border",
+  green: "border-primary",
+  line2: "border-border",
+  blue: "border-energy-orange",
+  violet: "border-elite",
+  amber: "border-border",
 };
 
 function formatCategoryName(category: string): string {

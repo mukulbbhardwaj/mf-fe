@@ -10,92 +10,61 @@
 }
 
 @layer base {
-  :root {
-    /* --background: 0%, 0%, 10%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --card-hovered: 0 0% 98%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem; */
-    --background: 0, 0%, 10%;
-    --secondary-background: 0, 0%, 13%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-hovered: 240 10% 6.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0, 0%, 55%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --buy: 142 76% 36%;
-    --buy-foreground: 0 0% 100%;
-    --buy-hover: 142 76% 32%;
-    --sell: 0 84% 60%;
-    --sell-foreground: 0 0% 100%;
-    --sell-hover: 0 84% 55%;
-    --profit: 142 76% 36%;
-    --profit-foreground: 142 76% 50%;
-    --loss: 0 84% 60%;
-    --loss-foreground: 0 84% 70%;
-  }
-
+  /*
+   * MonkeFinance Theme System — "Neon Jungle Trading Arena"
+   * Base: #0F1116, Neon Green: #00FF9C, Banana: #FFD84D, Loss: #FF4D6D, Elite: #7C5CFF
+   */
+  :root,
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-hovered: 240 10% 6.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --buy: 142 76% 36%;
-    --buy-foreground: 0 0% 100%;
-    --buy-hover: 142 76% 32%;
-    --sell: 0 84% 60%;
+    /* Base backgrounds (Section 3) */
+    --background: 220 19% 7%; /* #0F1116 Primary */
+    --secondary-background: 222 24% 11%; /* #151922 Secondary */
+    --card: 222 26% 15%; /* #1C2230 Card */
+    --card-hovered: 222 24% 18%; /* #222938 Elevated */
+    --popover: 222 26% 15%;
+    --popover-foreground: 210 33% 93%;
+
+    /* Text (Section 9) */
+    --foreground: 210 33% 93%; /* #E6EDF3 Primary text */
+    --card-foreground: 210 33% 93%;
+    --secondary-foreground: 216 10% 65%; /* #9BA3AF Secondary text */
+    --muted-foreground: 220 9% 46%; /* #6B7280 Muted */
+
+    /* Primary = Neon Profit Green (Section 4) */
+    --primary: 156 100% 50%; /* #00FF9C */
+    --primary-foreground: 220 19% 7%; /* #0F1116 Inverse on buttons */
+
+    /* Secondary / Muted surfaces */
+    --secondary: 222 26% 15%;
+    --muted: 222 24% 18%;
+    --accent: 222 24% 18%;
+    --accent-foreground: 210 33% 93%;
+
+    /* Destructive = Loss Red (Section 7) */
+    --destructive: 349 100% 65%; /* #FF4D6D */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders (Section 10) */
+    --border: 222 24% 22%; /* #2A3244 */
+    --input: 222 24% 22%;
+    --ring: 156 100% 50%; /* Focus = green */
+
+    /* Trading semantic (profit = green, loss = red) */
+    --buy: 156 100% 50%;
+    --buy-foreground: 220 19% 7%;
+    --buy-hover: 156 100% 45%; /* #00E68A */
+    --sell: 349 100% 65%;
     --sell-foreground: 0 0% 100%;
-    --sell-hover: 0 84% 55%;
-    --profit: 142 76% 36%;
-    --profit-foreground: 142 76% 50%;
-    --loss: 0 84% 60%;
-    --loss-foreground: 0 84% 70%;
+    --sell-hover: 349 100% 60%;
+    --profit: 156 100% 50%;
+    --profit-foreground: 156 100% 50%;
+    --loss: 349 100% 65%;
+    --loss-foreground: 349 100% 65%;
+
+    /* Theme system extras (Section 5, 6, 8) — use for rewards, streaks, elite */
+    --banana: 45 100% 65%; /* #FFD84D XP/rewards */
+    --energy-orange: 36 100% 55%; /* #FF9F1C Streaks/CTA */
+    --elite: 252 100% 68%; /* #7C5CFF Premium/elite */
   }
 }
 
@@ -151,13 +120,9 @@
   scrollbar-width: none;
 }
 
-button:hover {
-  color: #87b5e0;
-}
-
-.link:hover{
-   color: #87b5e0;
-   cursor: pointer;
+.link:hover {
+  cursor: pointer;
+  @apply text-primary;
 }
 
 
